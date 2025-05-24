@@ -45,36 +45,20 @@ public:
     plantMines(boardPopulated, bombPositions);
   }
 
-  // bombPositions zaczyna od indexu 0, wartosci min 1
-  // pos odnosii sie do wartosci 1 do N
-  // index odnosi sie do kolejnych liczb w bombPositions
-  // tutaj trzeba naprawic funkcje, poniewaz jest blad gdzies w pos i index
-
-  void plantMines(vector<vector<char>> &boardPopulated, vector<int> &bombPositions)
+  void plantMines(vector<vector<char>> &boardPopulated, vector<int> bombPositions)
   {
-    cout << "Starting planting mines..." << endl;
-    sort(bombPositions.begin(), bombPositions.end());
     displayBombPositions();
-    int pos = 0;
-    int index = 0;
-    for (int i = 0; i < boardPopulated.size(); i++)
+    cout << "Starting planting mines..." << endl;
+    while (bombPositions.size() != 0)
     {
-      pos++;
-      cout << "pos1: " << pos << endl;
-      for (int j = 0; j < boardPopulated.at(i).size(); j++)
-      {
-        if (pos == bombPositions[index] && index < bombPositions.size())
-        {
-          boardPopulated[i][j] = 'X';
-          index++;
-        }
-        if (j < boardPopulated.size())
-        {
-          pos++;
-          cout << "pos2: " << pos << endl;
-        }
-      }
+      int pos = bombPositions.at(0) - 1;
+      int i = pos / y;
+      int j = pos - y * i;
+      boardPopulated.at(i).at(j) = 'X';
+      cout << "Planted a bomb at i: " << i << " j: " << j << endl;
+      bombPositions.erase(bombPositions.begin());
     }
+
     cout << "Finished planting mines." << endl;
   }
 
