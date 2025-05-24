@@ -30,19 +30,19 @@ public:
     boardPopulated.resize(x);
     for (int i = 0; i < x; i++)
     {
-      cout << i << " ";
       for (int j = 0; j < y; j++)
       {
-        cout << j << " ";
         boardPopulated.at(i).push_back('-');
-        cout << j << "";
       }
-      cout << endl;
     }
     cout << "Finished initlializating the board." << endl;
     cout << "Starting the generation of mines' positions..." << endl;
     generateMinePositions(mines, (x * y), bombPositions);
+    displayBoard();
     plantMines(boardPopulated, bombPositions);
+    displayBoard();
+    generateNumbers(boardPopulated);
+    displayBoard();
   }
 
   void plantMines(vector<vector<char>> &boardPopulated, vector<int> bombPositions)
@@ -55,7 +55,6 @@ public:
       int i = pos / y;
       int j = pos - y * i;
       boardPopulated.at(i).at(j) = 'X';
-      cout << "Planted a bomb at i: " << i << " j: " << j << endl;
       bombPositions.erase(bombPositions.begin());
     }
 
@@ -64,6 +63,7 @@ public:
 
   // M - M integers
   // N-  range from 1..N
+  // Floyd's Algorithm implementantion from  "More Programming Pearls, connfesions of a coder byJon Bentley"
   vector<int> generateMinePositions(int M, int N, vector<int> &bombPositions)
   {
     if (M == 0)
@@ -95,7 +95,8 @@ public:
     {
       cout << bombPositions.at(i) << " ";
     }
-    cout << "Finished displaying the positions of bombs." << endl;
+    cout << endl
+         << "Finished displaying the positions of bombs." << endl;
   }
 
   void displayBoard()
@@ -110,6 +111,67 @@ public:
       cout << endl;
     }
     cout << "Displaying the board." << endl;
+  }
+
+  // szukamy jedynie bomb
+  void generateNumbers(vector<vector<char>> &boardPopulated)
+  {
+    cout << "Starting to generate numbers on the board..." << endl;
+    int cells = x * y;
+    int i = 0, j = 0;
+    while (cells != 0)
+    {
+      cout << "checking for i: " << i << " j: " << j << endl;
+      // czy cell jest bomba;
+      if (boardPopulated.at(i).at(j) == 'X')
+      {
+        cout << "i: " << i << " j: " << j << " is a bomb" << endl;
+      }
+      // jak nie jest bomba, to sprawdz czy sa bomby dookola
+      else
+      {
+        int bombCounter = 0;
+        for (int k = i - 1; k <= i + 1; k++)
+        {
+          cout << "1. k: " << k << endl;
+          if (k >= 0 && k <= x - 1)
+          {
+            cout << "2. in: " << endl;
+
+            for (int p = j - 1; p <= j + 1; p++)
+            {
+              cout << "3. p: " << p << endl;
+
+              if (p >= 0 && p <= y - 1)
+              {
+                cout << "4. in: " << endl;
+                if (boardPopulated.at(k).at(p) == 'X')
+                {
+                  cout << "5. in: " << endl;
+                  bombCounter++;
+                }
+              }
+            }
+          }
+        }
+        boardPopulated.at(i).at(j) = '0' + bombCounter;
+        cout << "i: " << i << " j: " << j << " is number: " << bombCounter << endl;
+      }
+      cells--;
+      cout << "cells left: " << cells << endl
+           << "---------------" << endl;
+
+      if (j == y - 1)
+      {
+        i++;
+        j = 0;
+      }
+      else
+      {
+        j++;
+      }
+    }
+    cout << "Finished generating numbers on the board." << endl;
   }
 
   int getX()
@@ -158,10 +220,5 @@ int main()
   int y1 = board.getY();
   int mines1 = board.getMines();
 
-  cout << "displayBombPositions: " << endl;
-  board.displayBombPositions();
-  cout << endl;
-  cout << "displayBoard: " << endl;
-  board.displayBoard();
   return 0;
 }
